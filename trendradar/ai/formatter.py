@@ -107,9 +107,13 @@ def render_ai_analysis_markdown(result: AIAnalysisResult) -> str:
     if result.standalone_summaries:
         summaries_text = _format_standalone_summaries(result.standalone_summaries)
         if summaries_text:
-            lines.extend(["**独立源点速览**", summaries_text])
+            lines.extend(["**独立源点速览**", summaries_text, ""])
 
-    return "\n".join(lines)
+    if result.custom_interpretations:
+        for name, interpret in result.custom_interpretations.items():
+            lines.extend([f"**🤖 {name}**", _format_list_content(interpret), ""])
+
+    return "\n".join(lines).strip()
 
 
 def render_ai_analysis_feishu(result: AIAnalysisResult) -> str:
@@ -143,9 +147,13 @@ def render_ai_analysis_feishu(result: AIAnalysisResult) -> str:
     if result.standalone_summaries:
         summaries_text = _format_standalone_summaries(result.standalone_summaries)
         if summaries_text:
-            lines.extend(["**独立源点速览**", summaries_text])
+            lines.extend(["**独立源点速览**", summaries_text, ""])
 
-    return "\n".join(lines)
+    if result.custom_interpretations:
+        for name, interpret in result.custom_interpretations.items():
+            lines.extend([f"**🤖 {name}**", _format_list_content(interpret), ""])
+
+    return "\n".join(lines).strip()
 
 
 def render_ai_analysis_dingtalk(result: AIAnalysisResult) -> str:
@@ -185,9 +193,13 @@ def render_ai_analysis_dingtalk(result: AIAnalysisResult) -> str:
     if result.standalone_summaries:
         summaries_text = _format_standalone_summaries(result.standalone_summaries)
         if summaries_text:
-            lines.extend(["#### 独立源点速览", summaries_text])
+            lines.extend(["#### 独立源点速览", summaries_text, ""])
 
-    return "\n".join(lines)
+    if result.custom_interpretations:
+        for name, interpret in result.custom_interpretations.items():
+            lines.extend([f"#### 🤖 {name}", _format_list_content(interpret), ""])
+
+    return "\n".join(lines).strip()
 
 
 def render_ai_analysis_html(result: AIAnalysisResult) -> str:
@@ -272,6 +284,19 @@ def render_ai_analysis_html(result: AIAnalysisResult) -> str:
                 ]
             )
 
+    if result.custom_interpretations:
+        for name, interpret in result.custom_interpretations.items():
+            content = _format_list_content(interpret)
+            content_html = _escape_html(content).replace("\n", "<br>")
+            html_parts.extend(
+                [
+                    '<div class="ai-section">',
+                    f"<h4>🤖 {name}</h4>",
+                    f'<div class="ai-content">{content_html}</div>',
+                    "</div>",
+                ]
+            )
+
     html_parts.append("</div>")
     return "\n".join(html_parts)
 
@@ -303,9 +328,13 @@ def render_ai_analysis_plain(result: AIAnalysisResult) -> str:
     if result.standalone_summaries:
         summaries_text = _format_standalone_summaries(result.standalone_summaries)
         if summaries_text:
-            lines.extend(["[独立源点速览]", summaries_text])
+            lines.extend(["[独立源点速览]", summaries_text, ""])
 
-    return "\n".join(lines)
+    if result.custom_interpretations:
+        for name, interpret in result.custom_interpretations.items():
+            lines.extend([f"[🤖 {name}]", _format_list_content(interpret), ""])
+
+    return "\n".join(lines).strip()
 
 
 def get_ai_analysis_renderer(channel: str):
@@ -396,6 +425,16 @@ def render_ai_analysis_html_rich(result: AIAnalysisResult) -> str:
                     <div class="ai-block">
                         <div class="ai-block-title">独立源点速览</div>
                         <div class="ai-block-content">{summaries_html}</div>
+                    </div>"""
+
+    if result.custom_interpretations:
+        for name, interpret in result.custom_interpretations.items():
+            content = _format_list_content(interpret)
+            content_html = _escape_html(content).replace("\n", "<br>")
+            ai_html += f"""
+                    <div class="ai-block">
+                        <div class="ai-block-title">🤖 {name}</div>
+                        <div class="ai-block-content">{content_html}</div>
                     </div>"""
 
     ai_html += """

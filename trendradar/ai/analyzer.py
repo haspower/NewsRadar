@@ -24,6 +24,7 @@ class AIAnalysisResult:
     rss_insights: str = ""               # RSS 深度洞察
     outlook_strategy: str = ""           # 研判与策略建议
     standalone_summaries: Dict[str, str] = field(default_factory=dict)  # 独立展示区概括 {源ID: 概括}
+    custom_interpretations: Dict[str, str] = field(default_factory=dict) # 可插拔的自定义Agent解读结果 {标识: 解读内容}
 
     # 基础元数据
     raw_response: str = ""               # 原始响应

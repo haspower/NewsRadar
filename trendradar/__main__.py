@@ -552,6 +552,14 @@ class NewsAnalyzer:
 
             # 设置 AI 分析使用的模式
             if result.success:
+                # 运行自定义解读Agent
+                try:
+                    from trendradar.ai.custom_agent import CustomAIAgent
+                    custom_agent = CustomAIAgent(ai_config)
+                    custom_agent.run_custom_interpretations(result)
+                except Exception as e:
+                    print(f"[AI] 自定义解读Agent执行异常: {e}")
+
                 result.ai_mode = ai_mode
                 if result.error:
                     # 成功但有警告（如 JSON 解析问题但使用了原始文本）
