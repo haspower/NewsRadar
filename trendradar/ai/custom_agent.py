@@ -31,16 +31,26 @@ class CustomAIAgent:
         """检查当前时间是否在指定范围内"""
         try:
             import datetime
+            from trendradar.utils.time import get_configured_time
+            
             start_str, end_str = time_range_str.split('-')
             start_time = datetime.datetime.strptime(start_str.strip(), "%H:%M").time()
             end_time = datetime.datetime.strptime(end_str.strip(), "%H:%M").time()
-            now_time = datetime.datetime.now().time()
+            
+            # 使用带配置时区的当前时间，避免系统时间(如 GitHub Actions 的 UTC)偏差
+            now = get_configured_time()
+            now_time = now.time()
             
             # 处理跨天情况 (如 23:00-07:00)
             if start_time <= end_time:
-                return start_time <= now_time <= end_time
+                is_within = start_time <= now_time <= end_time
             else:
-                return start_time <= now_time or now_time <= end_time
+                is_within = start_time <= now_time or now_time <= end_time
+                
+            if not is_within:
+                print(f"[CustomAgent] 当前时间 {now.strftime('%H:%M')} ({now.tzinfo}) 不在指定范围 {start_str.strip()}-{end_str.strip()} 内")
+                
+            return is_within
         except Exception as e:
             print(f"[CustomAgent] 时间范围格式解析错误 '{time_range_str}': {e}")
             return True # 解析失败默认放行
